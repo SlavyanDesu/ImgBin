@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload | TempStorage</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      background-color: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    button, input[type="file"] {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #statusMessage {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload File</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" id="fileInput" required />
+    <span id="fileName">No file chosen</span>
+    <button type="submit">Upload</button>
+  </form>
+
+  <p id="statusMessage" style="display: none;">Uploading...</p>
+  <button id="goToFiles" style="display: none;" onclick="window.location.href='/files'">
+    Go to Files
+  </button>
+
+  <script>
+    document.getElementById("fileInput").addEventListener("change", function () {
+      document.getElementById("fileName").textContent = this.files[0] ? this.files[0].name : "No file chosen"
+    })
+
+    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+      e.preventDefault()
+      const fileInput = document.getElementById("fileInput")
+      const statusMessage = document.getElementById("statusMessage")
+      const goToFiles = document.getElementById("goToFiles")
+
+      if (!fileInput.files.length) {
+        alert("Please select a file!")
+        return
+      }
+
+      statusMessage.textContent = "Uploading..."
+      statusMessage.style.color = "yellow"
+      statusMessage.style.display = "block"
+
+      const formData = new FormData()
+      formData.append("file", fileInput.files[0])
+
+      try {
+        const response = await fetch("/upload", { method: "POST", body: formData })
+        if (!response.ok) throw new Error("Upload failed")
+
+        statusMessage.textContent = "Upload Successful!"
+        statusMessage.style.color = "limegreen"
+        goToFiles.style.display = "block"
+      } catch (error) {
+        statusMessage.textContent = "Upload Failed!"
+        statusMessage.style.color = "red"
+      }
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home | TempStorage</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #121212;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    /* Animasi teks diketik */
+    .typing {
+      color: #e0e0e0;
+      font-size: 32px;
+      font-weight: bold;
+      border-right: 3px solid white;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 2s steps(20, end) forwards, blink 0.8s infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    .btn {
+      display: block;
+      width: 200px;
+      padding: 15px;
+      margin: 20px auto;
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+      background-color: #007bff;
+      border-radius: 5px;
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #005bb5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="typing">Welcome to TempStorage</h1>
+    <a href="/upload" class="btn">Upload</a>
+    <a href="/files" class="btn">Files</a>
+  </div>
+</body>
+</html>
