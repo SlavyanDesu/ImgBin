@@ -1,0 +1,61 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #121212;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 1.25rem;
+}
+
+.subheader {
+  font-size: 1rem;
+  color: #b0b0b0;
+  margin-bottom: 1.25rem;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  padding: 12px;
+  margin: 10px auto;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: #fff;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+.btn.upload {
+  background: #4CAF50;
+}
+
+.btn.upload:hover {
+  background: #45a049;
+}
+
+.btn.files {
+  background: #2196F3;
+}
+
+.btn.files:hover {
+  background: #1976D2;
+}

@@ -1,48 +1,54 @@
-import express from "express"
-import multer from "multer"
-import path from "path"
-import cloudinary from "../config/cloudinary"
+import express, { Request, Response } from "express";
+import multer from "multer";
+import path from "path";
+import cloudinary from "../config/cloudinary";
 
-const router = express.Router() 
-const upload = multer({ 
+const router = express.Router();
+const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB Max
-})
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+});
 
-router.post("/", upload.single("file"), (req, res) => {
-  try {
-    if (!req.file) {
-      res.status(400).json({ message: "No file uploaded" })
-      return
-    }
-
-    console.log("Fetching file details for:", req.file.originalname)
-    console.log("Uploading...")
-
-    const fileExt = path.extname(req.file.originalname)
-    const fileNameWithoutExt = req.file.originalname.replace(fileExt, "")
-    const uniqueFilename = `${Date.now()}-${encodeURIComponent(fileNameWithoutExt)}`
-
-    cloudinary.uploader.upload_stream(
-      { resource_type: "auto", public_id: uniqueFilename },
+// Helper function for uploading to Cloudinary
+const uploadToCloudinary = (fileBuffer: Buffer, fileName: string): Promise<{ url: string; publicId: string }> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto", public_id: fileName },
       (error, result) => {
-        if (error) {
-          console.error("Cloudinary Upload Error:", error)
-          return res.status(500).json({ message: "Upload failed" })
+        if (error || !result) {
+          console.error("[ERROR] Cloudinary Upload Error:", error);
+          reject(new Error("Upload failed"));
+        } else {
+          resolve({ url: result.secure_url, publicId: result.public_id });
         }
-
-        console.log("Successfully uploaded!")
-
-        res.json({
-          url: result?.secure_url,
-          publicId: result?.public_id,
-        })
       }
-    ).end(req.file.buffer)
-  } catch (error) {
-    console.error("Upload error:", error)
-    res.status(500).json({ message: "Internal server error" })
-  }
-})
+    );
+    uploadStream.end(fileBuffer);
+  });
+};
 
-export default router
+// File upload route
+router.post("/", upload.single("file"), async (req: Request, res: Response): Promise<void> => {
+  if (!req.file) {
+    res.status(400).json({ message: "No file uploaded" });
+    return;
+  }
+
+  try {
+    console.log(`[PROCESS] Uploading: ${req.file.originalname}`);
+
+    const fileExt = path.extname(req.file.originalname);
+    const fileNameWithoutExt = req.file.originalname.replace(fileExt, "");
+    const uniqueFilename = `${Date.now()}-${encodeURIComponent(fileNameWithoutExt)}`;
+
+    const { url, publicId } = await uploadToCloudinary(req.file.buffer, uniqueFilename);
+
+    console.log(`[DONE] Successfully uploaded! URL: ${url}`);
+    await res.json({ url, publicId });
+  } catch (error) {
+    console.error("[ERROR] Upload error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+export default router;

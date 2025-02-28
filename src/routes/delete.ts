@@ -1,38 +1,42 @@
-import express, { Request, Response } from "express"
-import cloudinary from "../config/cloudinary"
+import express, { Request, Response } from "express";
+import cloudinary from "../config/cloudinary";
 
-const router = express.Router()
+const router = express.Router();
 
-router.delete("/:publicId", async (req: Request, res: Response) => {
+/**
+ * DELETE /delete/:publicId
+ * Deletes a file from Cloudinary by its public ID.
+ */
+router.delete("/:publicId", async (req: Request, res: Response): Promise<void> => {
   try {
-    const { publicId }= req.params
-    console.log(req.params)
+    const { publicId } = req.params;
+    
+    console.log(`[PROCESS] Fetching file details for: ${publicId}`);
 
-    console.log("Fetching file details for:", publicId)
-
-    const fileInfo = await cloudinary.api.resource(publicId)
-
+    // Check if file exists
+    const fileInfo = await cloudinary.api.resource(publicId).catch(() => null);
     if (!fileInfo) {
-      res.status(404).json({ message: "File not found" })
-      return
+      console.warn(`[WARN] File not found: ${publicId}`);
+      res.status(404).json({ message: "File not found" });
+      return;
     }
 
-    console.log("Deleting:", publicId)
-
-    const result = await cloudinary.uploader.destroy(publicId)
+    console.log(`[PROCESS] Deleting file: ${publicId}`);
+    const result = await cloudinary.uploader.destroy(publicId);
 
     if (result.result !== "ok") {
-      res.status(400).json({ message: "Failed to delete file" })
-      return
+      console.warn(`[WARN] Failed to delete: ${publicId}`);
+      res.status(400).json({ message: "Failed to delete file" });
+      return;
     }
 
-    console.log("Deleted!")
-    res.json({ success: true, message: "File deleted successfully" })
-  } catch (err) {
-    console.error("Delete error:", err)
-    res.status(500).json({ message: "Internal server error" })
-    return
+    console.log(`[DONE] File deleted: ${publicId}`);
+    res.json({ success: true, message: "File deleted successfully" });
+    
+  } catch (error) {
+    console.error(`[ERROR] Delete error:`, error);
+    res.status(500).json({ message: "Internal server error" });
   }
-})
+});
 
-export default router 
+export default router;

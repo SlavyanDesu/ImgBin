@@ -1,0 +1,94 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #121212;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+label {
+  background: #1f1f1f;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 1rem;
+  width: 100%;
+  transition: background 0.2s ease-in-out;
+}
+
+label:hover {
+  background: #333;
+}
+
+#fileName {
+  font-size: 0.875rem;
+  color: gray;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #4CAF50;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+#statusMessage {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+#goToFiles {
+  display: none;
+  background: #2196F3;
+  width: 100%;
+  max-width: 300px;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+#goToFiles:hover {
+  background: #1976D2;
+}
