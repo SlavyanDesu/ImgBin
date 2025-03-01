@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.set("trust proxy", true);
 
 app.use(favicon(path.join(__dirname, "public", "/assets/favicon/favicon.ico")));
 app.use(cors({ credentials: true }));
@@ -22,7 +23,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: true },
+  cookie: { 
+    secure: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000
+  },
 }));
 
 app.use(express.json());
