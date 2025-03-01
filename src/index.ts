@@ -17,7 +17,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use(favicon(path.join(__dirname, "public", "/assets/favicon/favicon.ico")));
-app.use(cors());
+app.use(cors({ credentials: true }));
 app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: false,
