@@ -2,14 +2,24 @@ import express, { Request, Response } from "express";
 import multer from "multer";
 import path from "path";
 import cloudinary from "../config/cloudinary";
+import prisma from "../lib/prisma";
 
 const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png|gif|mp4/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error("[ERROR] Error: File type not allowed"));
+    }
+  },
 });
 
-// Helper function for uploading to Cloudinary
 const uploadToCloudinary = (fileBuffer: Buffer, fileName: string): Promise<{ url: string; publicId: string }> => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -27,7 +37,6 @@ const uploadToCloudinary = (fileBuffer: Buffer, fileName: string): Promise<{ url
   });
 };
 
-// File upload route
 router.post("/", upload.single("file"), async (req: Request, res: Response): Promise<void> => {
   if (!req.file) {
     res.status(400).json({ message: "No file uploaded" });
@@ -44,6 +53,16 @@ router.post("/", upload.single("file"), async (req: Request, res: Response): Pro
     const { url, publicId } = await uploadToCloudinary(req.file.buffer, uniqueFilename);
 
     console.log(`[DONE] Successfully uploaded! URL: ${url}`);
+
+    const userSessionId = req.session.id;
+
+    await prisma.fileMetadata.create({
+      data: {
+        publicId,
+        userSessionId,
+      },
+    });
+
     await res.json({ url, publicId });
   } catch (error) {
     console.error("[ERROR] Upload error:", error);

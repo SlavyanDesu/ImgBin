@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload | TempStorage</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/css/upload.css">
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -53,9 +54,12 @@
 </head>
 <body>
   <h1>Upload File</h1>
+  <div id="warningMessage" style="color: rgb(209, 35, 35); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; font-size: 12px;">
+    Please do not upload sensitive images or personal data.<br>Ensure that the files you upload are safe to share.
+  </div>
   <form id="uploadForm" enctype="multipart/form-data">
     <label for="fileInput">Choose File</label>
-    <input type="file" name="file" id="fileInput" required />
+    <input type="file" name="file" id="fileInput" />
     <span id="fileName">No file chosen</span>
     <button type="submit">Upload</button>
   </form>

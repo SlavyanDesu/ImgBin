@@ -12,7 +12,7 @@ body {
   height: 100vh;
   background: #121212;
   color: #fff;
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   text-align: center;
   overflow: hidden;
 }
@@ -60,6 +60,7 @@ button {
   width: 100%;
   padding: 12px;
   font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
   border: none;
   border-radius: 8px;
   background: #4CAF50;
