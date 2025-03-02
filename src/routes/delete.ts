@@ -7,7 +7,7 @@ const router = express.Router();
 router.delete("/:publicId", async (req: Request, res: Response): Promise<void> => {
   try {
     const { publicId } = req.params;
-    const userSessionId = req.session.id;
+    const userSessionId = req.cookies.userId;
 
     console.log(`[PROCESS] Fetching file details for: ${publicId}`);
 

@@ -1,9 +1,11 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
+import { v4 as uuid } from "uuid";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import favicon from "serve-favicon";
 import session from "express-session";
+import cookieParser from "cookie-parser";
 import uploadRouter from "./routes/upload";
 import deleteRouter from "./routes/delete";
 import filesRouter from "./routes/files";
@@ -18,16 +20,33 @@ app.set("views", path.join(__dirname, "views"));
 app.set("trust proxy", true);
 
 app.use(favicon(path.join(__dirname, "public", "/assets/favicon/favicon.ico")));
-app.use(cors({ credentials: true }));
+app.use(cors({
+  origin: "https://tempstorage.vercel.app",
+  credentials: true,
+}));
+
+app.use(cookieParser());
+
 app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
   cookie: { 
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     maxAge: 30 * 24 * 60 * 60 * 1000
   },
 }));
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (!req.cookies.userId) {
+    const uniqueId = uuid();
+    res.cookie("userId", uniqueId, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    })
+  }
+  next();
+})
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

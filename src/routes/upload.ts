@@ -54,12 +54,13 @@ router.post("/", upload.single("file"), async (req: Request, res: Response): Pro
 
     console.log(`[DONE] Successfully uploaded! URL: ${url}`);
 
-    const userSessionId = req.session.id;
+    // const userSessionId = req.session.id;
+    const userId = req.cookies.userId;
 
     await prisma.fileMetadata.create({
       data: {
         publicId,
-        userSessionId,
+        userSessionId: userId,
       },
     });
 
