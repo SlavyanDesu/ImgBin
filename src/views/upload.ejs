@@ -1,71 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload | TempStorage</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="/css/upload.css">
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      let selectedFile = null;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload | TempStorage</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="/css/upload.css" />
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let selectedFile = null;
 
-      document.getElementById("fileInput").addEventListener("change", function () {
-        if (this.files.length > 0) {
-          selectedFile = this.files[0];
-          document.getElementById("fileName").textContent = selectedFile.name;
-        } else {
-          selectedFile = null;
-          document.getElementById("fileName").textContent = "No file chosen";
-        }
+        document
+          .getElementById("fileInput")
+          .addEventListener("change", function () {
+            if (this.files.length > 0) {
+              selectedFile = this.files[0];
+              document.getElementById("fileName").textContent =
+                selectedFile.name;
+            } else {
+              selectedFile = null;
+              document.getElementById("fileName").textContent =
+                "No file chosen";
+            }
+          });
+
+        document
+          .getElementById("uploadForm")
+          .addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const statusMessage = document.getElementById("statusMessage");
+            const goToFiles = document.getElementById("goToFiles");
+
+            if (!selectedFile) {
+              alert("Please select a file!");
+              return;
+            }
+
+            statusMessage.textContent = "Uploading...";
+            statusMessage.style.color = "yellow";
+            statusMessage.style.display = "block";
+
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            try {
+              const response = await fetch("/upload", {
+                method: "POST",
+                body: formData,
+              });
+              if (!response.ok) throw new Error("Upload failed");
+
+              statusMessage.textContent = "Upload Successful!";
+              statusMessage.style.color = "limegreen";
+              goToFiles.style.display = "block";
+            } catch (error) {
+              statusMessage.textContent = "Upload Failed!";
+              statusMessage.style.color = "red";
+            }
+          });
       });
-
-      document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
-        const statusMessage = document.getElementById("statusMessage");
-        const goToFiles = document.getElementById("goToFiles");
-
-        if (!selectedFile) {
-          alert("Please select a file!");
-          return;
-        }
-
-        statusMessage.textContent = "Uploading...";
-        statusMessage.style.color = "yellow";
-        statusMessage.style.display = "block";
-
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-
-        try {
-          const response = await fetch("/upload", { method: "POST", body: formData });
-          if (!response.ok) throw new Error("Upload failed");
-
-          statusMessage.textContent = "Upload Successful!";
-          statusMessage.style.color = "limegreen";
-          goToFiles.style.display = "block";
-        } catch (error) {
-          statusMessage.textContent = "Upload Failed!";
-          statusMessage.style.color = "red";
-        }
-      });
-    });
-  </script>
-</head>
-<body>
-  <h1>Upload File</h1>
-  <div id="warningMessage" style="color: rgb(209, 35, 35); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; font-size: 12px;">
-    Please do not upload sensitive images or personal data.<br>Ensure that the files you upload are safe to share.
-  </div>
-  <form id="uploadForm" enctype="multipart/form-data">
-    <label for="fileInput">Choose File</label>
-    <input type="file" name="file" id="fileInput" />
-    <span id="fileName">No file chosen</span>
-    <button type="submit">Upload</button>
-  </form>
-  <p id="statusMessage" style="display: none;">Uploading...</p>
-  <button id="goToFiles" onclick="window.location.href='/files'">
-    Go to Files
-  </button>
-</body>
+    </script>
+  </head>
+  <body>
+    <h1>Upload File</h1>
+    <div
+      id="warningMessage"
+      style="
+        color: rgb(209, 35, 35);
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        font-size: 12px;
+      "
+    >
+      Please do not upload sensitive images or personal data.<br />Ensure that
+      the files you upload are safe to share.
+    </div>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <label for="fileInput">Choose File</label>
+      <input type="file" name="file" id="fileInput" />
+      <span id="fileName">No file chosen</span>
+      <button type="submit">Upload</button>
+    </form>
+    <p id="statusMessage" style="display: none">Uploading...</p>
+    <button id="goToFiles" onclick="window.location.href='/files'">
+      Go to Files
+    </button>
+  </body>
 </html>

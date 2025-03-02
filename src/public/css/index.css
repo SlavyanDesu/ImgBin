@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -11,7 +13,7 @@ body {
   align-items: center;
   height: 100vh;
   background: #121212;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   color: #fff;
   text-align: center;
   overflow: hidden;
@@ -45,7 +47,7 @@ h1 {
 }
 
 .btn.upload {
-  background: #4CAF50;
+  background: #4caf50;
 }
 
 .btn.upload:hover {
@@ -53,11 +55,11 @@ h1 {
 }
 
 .btn.files {
-  background: #2196F3;
+  background: #2196f3;
 }
 
 .btn.files:hover {
-  background: #1976D2;
+  background: #1976d2;
 }
 
 footer {

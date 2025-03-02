@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -12,7 +14,7 @@ body {
   height: 100vh;
   background: #121212;
   color: #fff;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   text-align: center;
   overflow: hidden;
 }
@@ -60,10 +62,10 @@ button {
   width: 100%;
   padding: 12px;
   font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   border: none;
   border-radius: 8px;
-  background: #4CAF50;
+  background: #4caf50;
   color: #fff;
   cursor: pointer;
   transition: background 0.2s ease-in-out;
@@ -81,7 +83,7 @@ button:hover {
 
 #goToFiles {
   display: none;
-  background: #2196F3;
+  background: #2196f3;
   width: 100%;
   max-width: 300px;
   padding: 12px;
@@ -91,5 +93,5 @@ button:hover {
 }
 
 #goToFiles:hover {
-  background: #1976D2;
+  background: #1976d2;
 }

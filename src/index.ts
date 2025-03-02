@@ -20,22 +20,26 @@ app.set("views", path.join(__dirname, "views"));
 app.set("trust proxy", true);
 
 app.use(favicon(path.join(__dirname, "public", "/assets/favicon/favicon.ico")));
-app.use(cors({
-  origin: "https://tempstorage.vercel.app",
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "https://tempstorage.vercel.app",
+    credentials: true,
+  }),
+);
 
 app.use(cookieParser());
 
-app.use(session({
-  secret: process.env.SESSION_SECRET!,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 30 * 24 * 60 * 60 * 1000
-  },
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    },
+  }),
+);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (!req.cookies.userId) {
@@ -43,10 +47,10 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     res.cookie("userId", uniqueId, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-    })
+    });
   }
   next();
-})
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -7,10 +7,12 @@ import prisma from "../lib/prisma";
 const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max
+  limits: { fileSize: 100 * 1024 * 1024 }, // 10 MB max
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif|mp4/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase(),
+    );
     const mimetype = filetypes.test(file.mimetype);
     if (mimetype && extname) {
       return cb(null, true);
@@ -20,7 +22,10 @@ const upload = multer({
   },
 });
 
-const uploadToCloudinary = (fileBuffer: Buffer, fileName: string): Promise<{ url: string; publicId: string }> => {
+const uploadToCloudinary = (
+  fileBuffer: Buffer,
+  fileName: string,
+): Promise<{ url: string; publicId: string }> => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       { resource_type: "auto", public_id: fileName },
@@ -31,44 +36,51 @@ const uploadToCloudinary = (fileBuffer: Buffer, fileName: string): Promise<{ url
         } else {
           resolve({ url: result.secure_url, publicId: result.public_id });
         }
-      }
+      },
     );
     uploadStream.end(fileBuffer);
   });
 };
 
-router.post("/", upload.single("file"), async (req: Request, res: Response): Promise<void> => {
-  if (!req.file) {
-    res.status(400).json({ message: "No file uploaded" });
-    return;
-  }
+router.post(
+  "/",
+  upload.single("file"),
+  async (req: Request, res: Response): Promise<void> => {
+    if (!req.file) {
+      res.status(400).json({ message: "No file uploaded" });
+      return;
+    }
 
-  try {
-    console.log(`[PROCESS] Uploading: ${req.file.originalname}`);
+    try {
+      console.log(`[PROCESS] Uploading: ${req.file.originalname}`);
 
-    const fileExt = path.extname(req.file.originalname);
-    const fileNameWithoutExt = req.file.originalname.replace(fileExt, "");
-    const uniqueFilename = `${Date.now()}-${encodeURIComponent(fileNameWithoutExt)}`;
+      const fileExt = path.extname(req.file.originalname);
+      const fileNameWithoutExt = req.file.originalname.replace(fileExt, "");
+      const uniqueFilename = `${Date.now()}-${encodeURIComponent(fileNameWithoutExt)}`;
 
-    const { url, publicId } = await uploadToCloudinary(req.file.buffer, uniqueFilename);
+      const { url, publicId } = await uploadToCloudinary(
+        req.file.buffer,
+        uniqueFilename,
+      );
 
-    console.log(`[DONE] Successfully uploaded! URL: ${url}`);
+      console.log(`[DONE] Successfully uploaded! URL: ${url}`);
 
-    // const userSessionId = req.session.id;
-    const userId = req.cookies.userId;
+      // const userSessionId = req.session.id;
+      const userId = req.cookies.userId;
 
-    await prisma.fileMetadata.create({
-      data: {
-        publicId,
-        userSessionId: userId,
-      },
-    });
+      await prisma.fileMetadata.create({
+        data: {
+          publicId,
+          userSessionId: userId,
+        },
+      });
 
-    await res.json({ url, publicId });
-  } catch (error) {
-    console.error("[ERROR] Upload error:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
+      await res.json({ url, publicId });
+    } catch (error) {
+      console.error("[ERROR] Upload error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+);
 
 export default router;

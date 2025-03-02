@@ -1,5 +1,5 @@
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   background-color: #121212;
   color: white;
   text-align: center;
@@ -28,7 +28,8 @@ table {
   table-layout: auto;
 }
 
-th, td {
+th,
+td {
   padding: 16px;
   border-bottom: 1px solid #333;
   text-align: center;

@@ -1,72 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Files | TempStorage</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="/css/files.css">
-  <script>
-    function deleteFile(publicId) {
-      if (!confirm("Are you sure you want to delete this file?")) return;
-    
-      fetch(`/delete/${encodeURIComponent(publicId)}`, { method: 'DELETE' }) 
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            return response.json()
-              .then(data => {
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Files | TempStorage</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="/css/files.css" />
+    <script>
+      function deleteFile(publicId) {
+        if (!confirm("Are you sure you want to delete this file?")) return;
+
+        fetch(`/delete/${encodeURIComponent(publicId)}`, { method: "DELETE" })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              return response.json().then((data) => {
                 throw new Error(data.message || "Failed to delete file");
               });
-          }
-        })
-        .then(data => {
-          if (data.success) {
-            alert("File deleted successfully!");
-            location.reload();
-          }
-        })
-        .catch(error => {
-          alert(error.message);
-          console.error("[ERROR] Error:", error);
-        });
-    }
-  </script>
-</head>
-<body>
-  <h1><a href="/" style="color: white; text-decoration: none;">TempStorage</a></h1>
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Thumbnail</th>
-          <th>Filename</th>
-          <th>Date Uploaded</th>
-          <th>Size</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% files.forEach(file => { %>
+            }
+          })
+          .then((data) => {
+            if (data.success) {
+              alert("File deleted successfully!");
+              location.reload();
+            }
+          })
+          .catch((error) => {
+            alert(error.message);
+            console.error("[ERROR] Error:", error);
+          });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>
+      <a href="/" style="color: white; text-decoration: none">TempStorage</a>
+    </h1>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Thumbnail</th>
+            <th>Filename</th>
+            <th>Date Uploaded</th>
+            <th>Size</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% files.forEach(file => { %>
           <tr>
             <td>
-              <img src="<%= file.thumbnailUrl %>" alt="Thumbnail" class="thumbnail">
+              <img
+                src="<%= file.thumbnailUrl %>"
+                alt="Thumbnail"
+                class="thumbnail"
+              />
             </td>
             <td class="filename"><%= file.filename %></td>
             <td><%= new Date(file.dateUploaded).toLocaleDateString() %></td>
-            <td><%= file.size >= 1000 * 1024 ? (file.size / (1024 * 1024)).toFixed(2) + ' MB' : (file.size / 1024).toFixed(2) + ' KB' %></td>
-            <td class="action-buttons"> 
-              <button onclick="location.href='<%= file.downloadUrl %>'" class="action-button download-btn">Download</button>
-              <button onclick="deleteFile('<%= file.filename %>')" class="action-button delete-btn">Delete</button>
+            <td>
+              <%= file.size >= 1000 * 1024 ? (file.size / (1024 *
+              1024)).toFixed(2) + ' MB' : (file.size / 1024).toFixed(2) + ' KB'
+              %>
+            </td>
+            <td class="action-buttons">
+              <button
+                onclick="location.href='<%= file.downloadUrl %>'"
+                class="action-button download-btn"
+              >
+                Download
+              </button>
+              <button
+                onclick="deleteFile('<%= file.filename %>')"
+                class="action-button delete-btn"
+              >
+                Delete
+              </button>
             </td>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
-  <footer>
-    © 2025 Heikal Syah Shiddiq. All rights reserved.
-  </footer>  
-</body>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <footer>© 2025 Heikal Syah Shiddiq. All rights reserved.</footer>
+  </body>
 </html>

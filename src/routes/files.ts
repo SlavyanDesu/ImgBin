@@ -10,11 +10,14 @@ const router = express.Router();
  * @returns Formatted file list
  */
 const formatFiles = (resources: ResourceApiResponse["resources"]) => {
-  return resources.map(file => ({
+  return resources.map((file) => ({
     filename: file.public_id,
     size: file.bytes,
     dateUploaded: file.created_at,
-    thumbnailUrl: file.secure_url.replace("/upload/", "/upload/c_thumb,w_200,h_200/"),
+    thumbnailUrl: file.secure_url.replace(
+      "/upload/",
+      "/upload/c_thumb,w_200,h_200/",
+    ),
     downloadUrl: file.secure_url,
   }));
 };
