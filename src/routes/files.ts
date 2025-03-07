@@ -1,15 +1,20 @@
 import express, { Request, Response } from "express";
-import { ResourceApiResponse } from "cloudinary";
+import { ResourceApiResponse, ResourceType } from "cloudinary";
 import cloudinary from "../config/cloudinary";
 
 const router = express.Router();
 
-/**
- * Formats Cloudinary response into a structured file list.
- * @param resources Cloudinary resource list
- * @returns Formatted file list
- */
-const formatFiles = (resources: ResourceApiResponse["resources"]) => {
+interface FormattedFile {
+  filename: string;
+  size: number;
+  dateUploaded: string;
+  thumbnailUrl: string;
+  downloadUrl: string;
+}
+
+const formatFiles = (
+  resources: ResourceApiResponse["resources"],
+): FormattedFile[] => {
   return resources.map((file) => ({
     filename: file.public_id,
     size: file.bytes,
@@ -26,17 +31,17 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
   try {
     console.log("[PROCESS] Fetching uploaded files from Cloudinary...");
 
-    const result = await cloudinary.api.resources({
+    const result: ResourceApiResponse = await cloudinary.api.resources({
       type: "upload",
-      resource_type: "image",
+      resource_type: "image" as ResourceType,
       max_results: 10,
     });
 
-    const files = formatFiles(result.resources);
+    const files: FormattedFile[] = formatFiles(result.resources);
     console.log(`[DONE] Successfully retrieved ${files.length} files.`);
 
     res.render("files", { files });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[ERROR] Error fetching files:", error);
     res.status(500).json({ message: "Failed to fetch files" });
   }

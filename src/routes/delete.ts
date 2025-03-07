@@ -32,6 +32,7 @@ router.delete(
       }
 
       console.log(`[PROCESS] Deleting file: ${publicId}`);
+
       const result = await cloudinary.uploader.destroy(publicId);
 
       if (result.result !== "ok") {
@@ -47,7 +48,7 @@ router.delete(
       });
 
       res.json({ success: true, message: "File deleted successfully" });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`[ERROR] Delete error:`, error);
       res.status(500).json({ message: "Internal server error" });
     }

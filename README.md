@@ -24,21 +24,25 @@ This project is a web application that allows users to upload and delete media f
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/SlavyanDesu/TempStorage.git
 ```
 
 2. Navigate to the project directory:
+
 ```bash
 cd TempStorage
 ```
 
 3. Install the depedencies:
+
 ```bash
 npm install
 ```
 
 4. Set up environment variables:
+
 ```
 CLOUDINARY_CLOUD_NAME="your-cloud-name"
 CLOUDINARY_API_KEY="your-api-key"
@@ -51,9 +55,11 @@ DATABASE_URL="postgresql://your-neondb:url@ep-cool-darkness-a1b2c3d4-pooler.us-e
 ## Usage
 
 To start the application, run:
+
 ```bash
 npm start
 ```
+
 Visit http://localhost:3000 in your browser to access the application.
 
 ## Features
@@ -77,18 +83,22 @@ Visit http://localhost:3000 in your browser to access the application.
 ## API Documentation
 
 ### Upload Endpoint
+
 - POST `/upload`
 - Request Body: Form data containing the file to upload.
 - Response: URL of the uploaded file.
 
 ### Delete Endpoint
+
 - DELETE `/delete/:publicId`
 - Parameters: `publicId` of the file to delete.
 - Response: Success message.
 
 ### Files Endpoint
+
 - GET `/files`
 - Response: Renders a page displaying uploaded files, including thumbnails and download links.
 
 ## License
+
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
