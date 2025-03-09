@@ -1,12 +1,11 @@
 {
   "name": "tempstorage",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "A simple, fast, and temporary file storage solution.",
   "main": "src/server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
-    "build": "tsc && npm run copy-public && npm run copy-views",
+    "build": "rimraf dist && tsc && npm run copy-public && npm run copy-views",
     "copy-public": "cpx \"src/public/**/*\" \"dist/public\"",
     "copy-views": "cpx \"src/views/**/*\" \"dist/views\"",
     "lint": "eslint .",
@@ -45,6 +44,7 @@
     "prettier": "3.5.2",
     "prettier-plugin-ejs": "^1.0.3",
     "prisma": "^6.4.1",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.26.0"

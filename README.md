@@ -52,6 +52,12 @@ PORT=3000
 DATABASE_URL="postgresql://your-neondb:url@ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech/dbname?sslmode=require"
 ```
 
+5. Build application:
+
+```bash
+npm run build
+```
+
 ## Usage
 
 To start the application, run:
