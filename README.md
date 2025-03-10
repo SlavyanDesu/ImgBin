@@ -5,7 +5,7 @@
 ![GitHub License](https://img.shields.io/github/license/SlavyanDesu/TempStorage)
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Ftempstorage.vercel.app)
 <br>
-This project is a web application that allows users to upload and delete media files (images and videos). It leverages Cloudinary for media storage and processing, providing features like file transformations and optimizations.
+This project is a web application that allows users to upload and delete images. It leverages Cloudinary for media storage and processing, providing features like file transformations, optimizations, and moderations.
 
 ## Table of Contents
 
@@ -71,14 +71,16 @@ Visit http://localhost:3000 in your browser to access the application.
 ## Features
 
 - File upload and management
-- Image and video transformations
+- Image transformations
 - Cookie-based validation for image deletion, ensuring that only the owner of an uploaded image can delete it
 - Responsive design for mobile and desktop
+- Image moderations
 
 ## Technologies Used
 
 - Node.js
 - Express.js
+- NSFWJS
 - [Cloudinary](https://cloudinary.com)
 - Prisma
 - [Neon](https://neon.tech)

@@ -9,7 +9,7 @@ router.delete(
   async (req: Request, res: Response): Promise<void> => {
     try {
       const { publicId } = req.params;
-      const userSessionId = req.cookies.userId;
+      const userId = req.cookies.userId;
 
       console.log(`[PROCESS] Fetching file details for: ${publicId}`);
 
@@ -23,7 +23,7 @@ router.delete(
         return;
       }
 
-      if (fileMetadata.userSessionId !== userSessionId) {
+      if (fileMetadata.userId !== userId) {
         console.warn(`[WARN] Unauthorized delete attempt for: ${publicId}`);
         res
           .status(403)

@@ -51,14 +51,22 @@
                 method: "POST",
                 body: formData,
               });
-              if (!response.ok) throw new Error("Upload failed");
+
+              const result = await response.json();
+              console.log("[DEBUG] Server Response:", result);
+              if (!response.ok)
+                throw new Error(result.message || "Upload failed");
 
               statusMessage.textContent = "Upload Successful!";
               statusMessage.style.color = "limegreen";
               goToFiles.style.display = "block";
             } catch (error) {
-              statusMessage.textContent = "Upload Failed!";
-              statusMessage.style.color = "red";
+              statusMessage.textContent = `Upload Failed: ${error.message}`;
+              statusMessage.style.color = "rgb(209, 35, 35)";
+              selectedFile = null;
+              document.getElementById("fileInput").value = "";
+              document.getElementById("fileName").textContent =
+                "No file chosen";
             }
           });
       });
