@@ -1,38 +1,121 @@
 import express, { Request, Response } from "express";
 import multer, { FileFilterCallback } from "multer";
+import vision from "@google-cloud/vision";
 import path from "path";
 import * as nsfwjs from "nsfwjs";
 import { createCanvas, loadImage } from "canvas";
 import cloudinary from "../config/cloudinary";
 import prisma from "../lib/prisma";
 import { UploadApiResponse } from "cloudinary";
+import { MODERATION_METHOD } from "../middlewares";
+console.log("[DEBUG] MODERATION_METHOD in upload.ts:", MODERATION_METHOD);
+
+interface SafeSearchAnnotation {
+  adult?:
+    | "UNKNOWN"
+    | "VERY_UNLIKELY"
+    | "UNLIKELY"
+    | "POSSIBLE"
+    | "LIKELY"
+    | "VERY_LIKELY";
+  spoof?:
+    | "UNKNOWN"
+    | "VERY_UNLIKELY"
+    | "UNLIKELY"
+    | "POSSIBLE"
+    | "LIKELY"
+    | "VERY_LIKELY";
+  medical?:
+    | "UNKNOWN"
+    | "VERY_UNLIKELY"
+    | "UNLIKELY"
+    | "POSSIBLE"
+    | "LIKELY"
+    | "VERY_LIKELY";
+  violence?:
+    | "UNKNOWN"
+    | "VERY_UNLIKELY"
+    | "UNLIKELY"
+    | "POSSIBLE"
+    | "LIKELY"
+    | "VERY_LIKELY";
+  racy?:
+    | "UNKNOWN"
+    | "VERY_UNLIKELY"
+    | "UNLIKELY"
+    | "POSSIBLE"
+    | "LIKELY"
+    | "VERY_LIKELY";
+}
 
 const router = express.Router();
 
-let nsfwModel: nsfwjs.NSFWJS | null = null;
+let isNsfw:
+  | ((
+      imageBuffer: Buffer,
+    ) => Promise<SafeSearchAnnotation | nsfwjs.PredictionType[]>)
+  | null = null;
+let formattedPredictions: string | null = null;
 
-const loadModel = async () => {
-  nsfwModel = await nsfwjs.load("MobileNetV2");
-  console.log("[NSFWJS] NSFWJS model loaded!");
-};
+if (MODERATION_METHOD === "nsfwjs") {
+  console.log("[MODERATION] Using NSFWJS...");
 
-loadModel();
+  let model: nsfwjs.NSFWJS | null = null;
+  const loadModel = async () => {
+    model = await nsfwjs.load("MobileNetV2");
+  };
 
-const isNsfw = async (imageBuffer: Buffer) => {
-  if (!nsfwModel) throw new Error("NSFW model is not loaded");
-  const img = await loadImage(imageBuffer);
+  loadModel();
 
-  const canvas = createCanvas(img.width, img.height);
-  const ctx = canvas.getContext("2d");
+  isNsfw = async (imageBuffer: Buffer) => {
+    const img = await loadImage(imageBuffer);
 
-  ctx.drawImage(img, 0, 0, img.width, img.height);
+    const canvas = createCanvas(img.width, img.height);
+    const ctx = canvas.getContext("2d");
 
-  const predictions = await nsfwModel.classify(
-    canvas as unknown as HTMLCanvasElement,
-  );
+    ctx.drawImage(img, 0, 0);
 
-  return predictions;
-};
+    const predictions = await model?.classify(
+      canvas as unknown as HTMLCanvasElement,
+    );
+
+    formattedPredictions = predictions!
+      .map((p) => `${p.className}: ${(p.probability * 100).toFixed(2)}%`)
+      .join("\n");
+    console.log(`[NSFWJS] Predictions:\n${formattedPredictions}`);
+
+    return predictions ?? [];
+  };
+} else if (MODERATION_METHOD === "google-vision") {
+  console.log("[MODERATION] Using Google Vision API...");
+
+  const client = new vision.ImageAnnotatorClient();
+
+  isNsfw = async (imageBuffer: Buffer) => {
+    const request = {
+      image: { content: imageBuffer.toString("base64") },
+    };
+
+    try {
+      const [result] = await client.safeSearchDetection(request);
+      const predictions = result.safeSearchAnnotation;
+      if (!predictions) {
+        throw new Error("Google Vision API did not return SafeSearch results");
+      }
+
+      formattedPredictions = Object.entries(predictions)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join("\n");
+      console.log(`[VISION] Predictions:\n${formattedPredictions}`);
+      return predictions as SafeSearchAnnotation;
+    } catch (error) {
+      console.error("[ERROR] Google Vision API error:", error);
+      throw new Error("Failed to analyze image with Google Vision");
+    }
+  };
+} else {
+  console.error("[MODERATION] Invalid moderation method!");
+}
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -59,19 +142,26 @@ const uploadToCloudinary = async (
   fileBuffer: Buffer,
   fileName: string,
 ): Promise<{ url: string; publicId: string } | null> => {
-  const predictions = await isNsfw(fileBuffer);
-  const formattedPredictions = predictions
-    .map((p) => `${p.className}: ${(p.probability * 100).toFixed(2)}%`)
-    .join("\n");
-  console.log(`[NSFWJS] Predictions:\n${formattedPredictions}`);
+  const predictions = await isNsfw!(fileBuffer);
 
-  const nsfwScore = predictions.find(
-    (p) => p.className === "Porn" || p.className === "Hentai",
-  );
-
-  if (nsfwScore && nsfwScore.probability > 0.5) {
-    console.warn("[NSFWJS] Upload blocked due to NSFW content");
-    return null;
+  if (MODERATION_METHOD === "nsfwjs" && Array.isArray(predictions)) {
+    const nsfwScore = predictions.find(
+      (p) => p.className === "Porn" || p.className === "Hentai",
+    );
+    if (nsfwScore && nsfwScore.probability > 0.5) {
+      console.warn("[NSFWJS] Upload blocked due to NSFW content");
+      return null;
+    }
+  } else if (!Array.isArray(predictions)) {
+    if (
+      predictions.adult === "LIKELY" ||
+      predictions.adult === "VERY_LIKELY" ||
+      predictions.racy === "LIKELY" ||
+      predictions.racy === "VERY_LIKELY"
+    ) {
+      console.warn("[VISION] Upload blocked due to NSFW content");
+      return null;
+    }
   }
 
   return new Promise((resolve, reject) => {

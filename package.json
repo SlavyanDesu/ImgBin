@@ -1,6 +1,6 @@
 {
   "name": "tempstorage",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "A simple, fast, and straightforward temporary image uploader.",
   "main": "src/server.ts",
   "scripts": {
@@ -18,9 +18,9 @@
   "author": "SlavyanDesu",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/vision": "^4.3.3",
     "@prisma/client": "^6.4.1",
     "@tensorflow/tfjs": "^4.22.0",
-    "@tensorflow/tfjs-node": "^4.22.0",
     "canvas": "^3.1.0",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",

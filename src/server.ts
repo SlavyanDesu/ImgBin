@@ -4,13 +4,15 @@ import cors from "cors";
 import path from "path";
 import favicon from "serve-favicon";
 import cookieParser from "cookie-parser";
-import { cookie, error } from "./middlewares";
+import { cookie, error, MODERATION_METHOD } from "./middlewares";
 import { routes } from "./routes";
 
 dotenv.config();
 
-const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || "3000", 10);
+const app: Application = express();
+
+console.log(`[CONFIG] Moderation method: ${MODERATION_METHOD}`);
 
 const start = (): void => {
   app.set("view engine", "ejs");
