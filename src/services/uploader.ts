@@ -1,7 +1,7 @@
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 import { isNsfw } from "./moderation";
-import { MODERATION_METHOD } from "../middlewares";
+import { MODERATION_METHOD } from "../config/serverConfig";
 import path from "path";
 import cloudinary from "../config/cloudinary";
 import { UploadApiResponse } from "cloudinary";
