@@ -50,9 +50,12 @@ CLOUDINARY_API_SECRET="your-api-secret"
 SESSION_SECRET="put-any-secret-code-you-like"
 PORT=3000
 DATABASE_URL="postgresql://your-neondb:url@ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech/dbname?sslmode=require"
+GOOGLE_APPLICATION_CREDENTIALS="./key/your-gcp-key.json"
+MODERATION="nsfwjs"
 ```
+For `MODERATION` value you can choose between `nsfwjs` or `google-vision` as your image detection. Keep in mind that you need to setup your own Cloud Platform Project on GCP and download keys of the project's service account as JSON if you prefer `google-vision`. Check [here](https://cloud.google.com/vision/docs/detecting-safe-search) for details.
 
-5. Build application:
+1. Build application:
 
 ```bash
 npm run build
@@ -81,9 +84,10 @@ Visit http://localhost:3000 in your browser to access the application.
 - Node.js
 - Express.js
 - NSFWJS
-- [Cloudinary](https://cloudinary.com)
-- Prisma
-- [Neon](https://neon.tech)
+- Google Cloud Vision
+- Cloudinary
+- Prisma ORM
+- Neon
 - TypeScript
 - EJS
 - HTML/CSS/JavaScript

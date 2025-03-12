@@ -19,10 +19,9 @@ let isNsfw:
 let formattedPredictions: string | null = null;
 
 const initializeNsfwjs = async () => {
-  console.log('[DEBUG] Initializing NSFWJS...')
+  console.log("[DEBUG] Initializing NSFWJS...");
 
   const model = await nsfwjs.load("MobileNetV2");
-  
 
   return async (imageBuffer: Buffer) => {
     const img = await loadImage(imageBuffer);
@@ -46,7 +45,7 @@ const initializeNsfwjs = async () => {
 };
 
 const initializeGoogleVision = async () => {
-  console.log('[DEBUG] Initializing Google Vision...')
+  console.log("[DEBUG] Initializing Google Vision...");
 
   const client = new vision.ImageAnnotatorClient();
 

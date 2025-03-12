@@ -1,7 +1,7 @@
 {
   "name": "tempstorage",
-  "version": "1.7.1",
-  "description": "A simple, fast, and straightforward temporary image uploader.",
+  "version": "1.7.4",
+  "description": "Temporary image uploader with advanced features.",
   "main": "src/server.ts",
   "scripts": {
     "dev": "nodemon",
