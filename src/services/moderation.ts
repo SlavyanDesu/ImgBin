@@ -17,45 +17,53 @@ let isNsfw:
     ) => Promise<SafeSearchAnnotation | nsfwjs.PredictionType[]>)
   | null = null;
 
-if (MODERATION_METHOD === "nsfwjs") {
-  console.log("[MODERATION] Using NSFWJS...");
+const initializeNsfwjs = async () => {
+  const model = await nsfwjs.load('MobileNetV2')
 
-  let model: nsfwjs.NSFWJS | null = null;
-
-  const loadModel = async () => {
-    model = await nsfwjs.load("MobileNetV2"); // Using MobileNetV2, change it whatever you like
-  };
-
-  loadModel();
-
-  isNsfw = async (imageBuffer: Buffer) => {
+  return async (imageBuffer: Buffer) => {
     const img = await loadImage(imageBuffer);
     const canvas = createCanvas(img.width, img.height);
     const ctx = canvas.getContext("2d");
 
-    ctx.drawImage(img, 0, 0);
-
-    const predictions = await model?.classify(
+    ctx.drawImage(img, 0, 0)
+    const predictions = await model.classify(
       canvas as unknown as HTMLCanvasElement,
     );
-    return predictions ?? [];
-  };
-} else if (MODERATION_METHOD === "google-vision") {
-  console.log("[MODERATION] Using Google Vision API...");
-  const client = new vision.ImageAnnotatorClient();
+    return predictions ?? []
+  }
+}
 
-  isNsfw = async (imageBuffer: Buffer) => {
+const initializeGoogleVision = async () => {
+  const client = new vision.ImageAnnotatorClient()
+
+  return async (imageBuffer: Buffer) => {
     const request = {
       image: {
-        content: imageBuffer.toString("base64"),
-      },
-    };
-    const [result] = await client.annotateImage(request);
-    const predictions = result.safeSearchAnnotation as SafeSearchAnnotation;
-    return predictions;
-  };
-} else {
-  console.error("[MODERATION] Invalid moderation method!");
+        content: imageBuffer.toString('base64')
+      }
+    }
+    const [result] = await client.annotateImage(request)
+    const predictions = result.safeSearchAnnotation as SafeSearchAnnotation
+    return predictions
+  }
 }
+
+const initializeModerationMethod = async () => {
+  switch (MODERATION_METHOD) {
+    case 'nsfwjs':
+      isNsfw = await initializeNsfwjs()
+      break
+    case 'google-vision':
+      isNsfw = await initializeGoogleVision()
+      break
+    default:
+      console.error('[MODERATION] Invalid moderation method')
+      isNsfw = null
+  }
+}
+
+initializeModerationMethod().catch((error) => {
+  console.error('[ERROR] Failed to initialize moderation method:', error)
+})
 
 export { isNsfw };
