@@ -1,19 +1,21 @@
-import express, { Application } from "express";
+import express from "express";
 import { applyMiddlewares } from "./middlewares";
 import { routes } from "./routes";
-import { PORT } from "./config/serverConfig";
-import { configureServer } from "./config/serverConfig";
+import { PORT } from "./configs/serverConfig";
+import { configureServer } from "./configs/serverConfig";
 
-const app: Application = express();
+const app = express();
 
-const start = (): void => {
-  configureServer(app);
-  applyMiddlewares(app);
-  routes(app);
+app.set("view engine", "ejs");
 
+configureServer(app);
+applyMiddlewares(app);
+routes(app);
+
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on  http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
-};
+}
 
-start();
+export default app;
