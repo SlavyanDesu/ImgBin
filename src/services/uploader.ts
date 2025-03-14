@@ -1,10 +1,10 @@
-import multer, { FileFilterCallback } from "multer";
+import { UploadApiResponse } from "cloudinary";
 import { Request } from "express";
-import { isNsfw } from "./moderation";
-import { MODERATION_METHOD } from "../configs/serverConfig";
+import multer, { FileFilterCallback } from "multer";
 import path from "path";
 import cloudinary from "../configs/cloudinary";
-import { UploadApiResponse } from "cloudinary";
+import { MODERATION_METHOD } from "../configs/serverConfig";
+import { isNsfw } from "./moderation";
 
 const fileTypes = /jpeg|jpg|png/;
 const fileSize = 10 * 1024 * 1024; // 10 MB
@@ -49,7 +49,6 @@ const isContentNsfw = async (fileBuffer: Buffer): Promise<boolean> => {
     return (
       predictions.adult === "LIKELY" ||
       predictions.adult === "VERY_LIKELY" ||
-      predictions.racy === "LIKELY" ||
       predictions.racy === "VERY_LIKELY"
     );
   }
