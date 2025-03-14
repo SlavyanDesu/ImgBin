@@ -1,9 +1,9 @@
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 import { isNsfw } from "./moderation";
-import { MODERATION_METHOD } from "../config/serverConfig";
+import { MODERATION_METHOD } from "../configs/serverConfig";
 import path from "path";
-import cloudinary from "../config/cloudinary";
+import cloudinary from "../configs/cloudinary";
 import { UploadApiResponse } from "cloudinary";
 
 const fileTypes = /jpeg|jpg|png/;

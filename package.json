@@ -1,7 +1,7 @@
 {
-  "name": "tempstorage",
-  "version": "1.7.4",
-  "description": "Temporary image uploader with advanced features.",
+  "name": "imgbin",
+  "version": "2.0.0",
+  "description": "ImgBin is a web app that allows users to temporarily upload and manage images.",
   "main": "src/server.ts",
   "scripts": {
     "dev": "nodemon",
@@ -30,7 +30,6 @@
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
     "nsfwjs": "^4.2.1",
-    "serve-favicon": "^2.5.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

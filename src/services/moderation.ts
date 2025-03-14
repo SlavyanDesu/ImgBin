@@ -1,7 +1,7 @@
 import vision from "@google-cloud/vision";
 import * as nsfwjs from "nsfwjs";
 import { createCanvas, loadImage } from "canvas";
-import { MODERATION_METHOD } from "../config/serverConfig";
+import { getGCPCredentials, MODERATION_METHOD } from "../configs/serverConfig";
 
 export interface SafeSearchAnnotation {
   adult?: string;
@@ -19,7 +19,7 @@ let isNsfw:
 let formattedPredictions: string | null = null;
 
 const initializeNsfwjs = async () => {
-  console.log("[DEBUG] Initializing NSFWJS...");
+  console.log("[MODERATION] Initializing NSFWJS...");
 
   const model = await nsfwjs.load("MobileNetV2");
 
@@ -45,9 +45,9 @@ const initializeNsfwjs = async () => {
 };
 
 const initializeGoogleVision = async () => {
-  console.log("[DEBUG] Initializing Google Vision...");
+  console.log("[MODERATION] Initializing Google Vision...");
 
-  const client = new vision.ImageAnnotatorClient();
+  const client = new vision.ImageAnnotatorClient(getGCPCredentials());
 
   return async (imageBuffer: Buffer) => {
     const request = {

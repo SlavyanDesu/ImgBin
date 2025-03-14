@@ -14,7 +14,12 @@ router.post(
   upload.single("file"),
   async (req: Request, res: Response): Promise<void> => {
     if (!req.file) {
-      res.status(400).json({ message: "No file uploaded" });
+      res.status(400).json({
+        success: false,
+        url: null,
+        publicId: null,
+        message: "No file uploaded",
+      });
       return;
     }
 
@@ -34,7 +39,12 @@ router.post(
       );
 
       if (!uploadResult) {
-        res.status(400).json({ message: "NSFW content detected!" });
+        res.status(400).json({
+          success: false,
+          url: null,
+          publicId: null,
+          message: "NSFW content detected!",
+        });
         return;
       }
 
@@ -51,10 +61,20 @@ router.post(
         },
       });
 
-      res.json({ url, publicId });
+      res.json({
+        success: true,
+        url: url,
+        publicId: publicId,
+        message: "File uploaded successfully",
+      });
     } catch (error: unknown) {
       console.error("[ERROR] Upload error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({
+        success: false,
+        url: null,
+        publicId: null,
+        message: "Internal server error",
+      });
     }
   },
 );
