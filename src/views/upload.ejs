@@ -3,7 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload | TempStorage</title>
+    <meta property="og:title" content="ImgBin | Upload" />
+    <meta
+      property="description"
+      content="Easily upload and store your images temporarily with ImgBin."
+    />
+    <meta
+      property="og:description"
+      content="Easily upload and store your images temporarily with ImgBin."
+    />
+    <meta property="og:site_name" content="ImgBin" />
+    <meta
+      property="og:image"
+      content="https://imgbin.vercel.app/assets/aaa.jpg"
+    />
+    <meta property="og:url" content="https://imgbin.vercel.app/upload" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ImgBin | Upload" />
+    <meta
+      name="twitter:description"
+      content="Easily upload and store your images temporarily with ImgBin."
+    />
+    <meta
+      name="twitter:image"
+      content="https://imgbin.vercel.app/assets/aaa.jpg"
+    />
+    <title>ImgBin | Upload</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
@@ -32,7 +57,7 @@
           .addEventListener("submit", async function (e) {
             e.preventDefault();
             const statusMessage = document.getElementById("statusMessage");
-            const goToFiles = document.getElementById("goToFiles");
+            const goToGallery = document.getElementById("goToGallery");
 
             if (!selectedFile) {
               alert("Please select a file!");
@@ -53,13 +78,15 @@
               });
 
               const result = await response.json();
-              console.log("[DEBUG] Server Response:", result);
               if (!response.ok)
                 throw new Error(result.message || "Upload failed");
 
               statusMessage.textContent = "Upload Successful!";
               statusMessage.style.color = "limegreen";
-              goToFiles.style.display = "block";
+              goToGallery.style.display = "block";
+              document.getElementById("fileInput").value = "";
+              document.getElementById("fileName").textContent =
+                "No file chosen";
             } catch (error) {
               statusMessage.textContent = `Upload Failed: ${error.message}`;
               statusMessage.style.color = "rgb(209, 35, 35)";
@@ -85,8 +112,7 @@
         font-size: 12px;
       "
     >
-      Please do not upload sensitive images or personal data.<br />Ensure that
-      the files you upload are safe to share.
+      Please do not upload sensitive images or personal data.<br />
     </div>
     <form id="uploadForm" enctype="multipart/form-data">
       <label for="fileInput">Choose File</label>
@@ -95,8 +121,8 @@
       <button type="submit">Upload</button>
     </form>
     <p id="statusMessage" style="display: none">Uploading...</p>
-    <button id="goToFiles" onclick="window.location.href='/files'">
-      Go to Files
+    <button id="goToGallery" onclick="window.location.href='/gallery'">
+      Go to Gallery
     </button>
   </body>
 </html>
