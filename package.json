@@ -1,6 +1,6 @@
 {
   "name": "imgbin",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "ImgBin is a web app that allows users to temporarily upload and manage images.",
   "main": "src/server.ts",
   "scripts": {
