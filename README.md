@@ -1,15 +1,15 @@
-# TempStorage
+# ImgBin
 
-[![CodeFactor](https://www.codefactor.io/repository/github/slavyandesu/tempstorage/badge)](https://www.codefactor.io/repository/github/slavyandesu/tempstorage)
-![GitHub repo size](https://img.shields.io/github/repo-size/SlavyanDesu/TempStorage)
-![GitHub License](https://img.shields.io/github/license/SlavyanDesu/TempStorage)
-![Website](https://img.shields.io/website?url=https%3A%2F%2Ftempstorage.vercel.app)
-<br>
-This project is a web application that allows users to upload and delete images. It leverages Cloudinary for media storage and processing, providing features like file transformations, optimizations, and moderations.
+[![CodeFactor](https://www.codefactor.io/repository/github/slavyandesu/imgbin/badge)](https://www.codefactor.io/repository/github/slavyandesu/imgbin)
+![GitHub repo size](https://img.shields.io/github/repo-size/SlavyanDesu/ImgBin)
+![GitHub License](https://img.shields.io/github/license/SlavyanDesu/ImgBin)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fimgbin.vercel.app)
+
+**ImgBin** is a web app that allows users to temporarily upload and manage images. It leverages **Cloudinary** for the storage and uses **NSFWJS** or **Google Vision API** for image moderation.
 
 ## Table of Contents
 
-- [TempStorage](#tempstorage)
+- [ImgBin](#imgbin)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -26,16 +26,16 @@ This project is a web application that allows users to upload and delete images.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/SlavyanDesu/TempStorage.git
+git clone https://github.com/SlavyanDesu/ImgBin.git
 ```
 
 2. Navigate to the project directory:
 
 ```bash
-cd TempStorage
+cd ImgBin
 ```
 
-3. Install the depedencies:
+3. Install the dependencies:
 
 ```bash
 npm install
@@ -47,16 +47,23 @@ npm install
 CLOUDINARY_CLOUD_NAME="your-cloud-name"
 CLOUDINARY_API_KEY="your-api-key"
 CLOUDINARY_API_SECRET="your-api-secret"
-SESSION_SECRET="put-any-secret-code-you-like"
 PORT=3000
 DATABASE_URL="postgresql://your-neondb:url@ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech/dbname?sslmode=require"
+GOOGLE_APPLICATION_CREDENTIALS="./key/your-gcp-key.json"
+MODERATION="nsfwjs"
 ```
 
-5. Build application:
+- `MODERATION` can be either `nsfwjs` or `google-vision`.
+- If you choose `google-vision`, you must set up a Google Cloud Project, enable the Vision API, and download the service account JSON key.
+- Google Cloud Vision API may require billing activation. See [Google's Documentation](https://cloud.google.com/vision/docs/detecting-safe-search) for details.
+
+5. Build the application:
 
 ```bash
 npm run build
 ```
+
+- The compiled files will be in `dist/` directory.
 
 ## Usage
 
@@ -66,27 +73,27 @@ To start the application, run:
 npm start
 ```
 
-Visit http://localhost:3000 in your browser to access the application.
+Visit http://localhost:3000 in your browser to access the app.
 
 ## Features
 
-- File upload and management
-- Image transformations
-- Cookie-based validation for image deletion, ensuring that only the owner of an uploaded image can delete it
+- Temporary image hosting with expiration
+- A simple and intuitive UI
+- Cookie-based validation for image deletion (only the uploader can delete)
 - Responsive design for mobile and desktop
-- Image moderations
+- Image moderation using NSFWJS or Google Cloud Vision API
 
 ## Technologies Used
 
 - Node.js
 - Express.js
 - NSFWJS
-- [Cloudinary](https://cloudinary.com)
-- Prisma
-- [Neon](https://neon.tech)
+- Google Cloud Vision
+- Cloudinary
+- Prisma ORM
+- NeonDB
 - TypeScript
 - EJS
-- HTML/CSS/JavaScript
 
 ## API Documentation
 
@@ -94,18 +101,34 @@ Visit http://localhost:3000 in your browser to access the application.
 
 - POST `/upload`
 - Request Body: Form data containing the file to upload.
-- Response: URL of the uploaded file.
+- Response example:
+
+```json
+{
+  "success": true,
+  "url": "https://res.cloudinary.com/abcd/image/upload/v1741948827/1741948783559-picture.png",
+  "publicId": "1741948783559-picture",
+  "message": "File deleted successfully"
+}
+```
 
 ### Delete Endpoint
 
 - DELETE `/delete/:publicId`
 - Parameters: `publicId` of the file to delete.
-- Response: Success message.
+- Response example:
+
+```json
+{
+  "success": true,
+  "message": "File deleted successfully"
+}
+```
 
 ### Files Endpoint
 
 - GET `/files`
-- Response: Renders a page displaying uploaded files, including thumbnails and download links.
+- Response: Renders a page displaying uploaded images.
 
 ## License
 

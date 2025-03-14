@@ -1,12 +1,12 @@
 import { Application, Request, Response } from "express";
 import upload from "./upload";
 import deleteFile from "./delete";
-import files from "./files";
+import gallery from "./gallery";
 
 export const routes = (app: Application): void => {
   app.use("/upload", upload);
   app.use("/delete", deleteFile);
-  app.use("/files", files);
+  app.use("/gallery", gallery);
 
   app.get("/", (req: Request, res: Response): void => {
     res.render("index");

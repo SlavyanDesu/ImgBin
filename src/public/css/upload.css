@@ -81,7 +81,7 @@ button:hover {
   font-weight: bold;
 }
 
-#goToFiles {
+#goToGallery {
   display: none;
   background: #2196f3;
   width: 100%;
@@ -92,6 +92,6 @@ button:hover {
   text-align: center;
 }
 
-#goToFiles:hover {
+#goToGallery:hover {
   background: #1976d2;
 }

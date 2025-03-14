@@ -1,7 +1,7 @@
 {
-  "name": "tempstorage",
-  "version": "1.7.0",
-  "description": "A simple, fast, and straightforward temporary image uploader.",
+  "name": "imgbin",
+  "version": "2.0.0",
+  "description": "ImgBin is a web app that allows users to temporarily upload and manage images.",
   "main": "src/server.ts",
   "scripts": {
     "dev": "nodemon",
@@ -18,9 +18,9 @@
   "author": "SlavyanDesu",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/vision": "^4.3.3",
     "@prisma/client": "^6.4.1",
     "@tensorflow/tfjs": "^4.22.0",
-    "@tensorflow/tfjs-node": "^4.22.0",
     "canvas": "^3.1.0",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.7",
@@ -30,7 +30,6 @@
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
     "nsfwjs": "^4.2.1",
-    "serve-favicon": "^2.5.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -38,14 +37,12 @@
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "@types/express-session": "^1.18.1",
     "@types/multer": "^1.4.12",
     "@types/serve-favicon": "^2.5.7",
     "cpx": "^1.5.0",
     "eslint": "^9.21.0",
     "globals": "^16.0.0",
     "nodemon": "^3.1.9",
-    "pre-commit": "^1.2.2",
     "prettier": "3.5.2",
     "prettier-plugin-ejs": "^1.0.3",
     "prisma": "^6.4.1",

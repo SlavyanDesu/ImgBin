@@ -3,12 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Files | TempStorage</title>
+    <meta property="og:title" content="ImgBin | Gallery" />
+    <meta
+      property="description"
+      content="Browse and manage your uploaded images on ImgBin."
+    />
+    <meta
+      property="og:description"
+      content="Browse and manage your uploaded images on ImgBin."
+    />
+    <meta property="og:site_name" content="ImgBin" />
+    <meta
+      property="og:image"
+      content="https://imgbin.vercel.app/assets/aaa.jpg"
+    />
+    <meta property="og:url" content="https://imgbin.vercel.app/gallery" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ImgBin | Gallery" />
+    <meta
+      name="twitter:description"
+      content="Browse and manage your uploaded images on ImgBin."
+    />
+    <meta
+      name="twitter:image"
+      content="https://imgbin.vercel.app/assets/aaa.jpg"
+    />
+    <title>ImgBin | Gallery</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     />
-    <link rel="stylesheet" href="/css/files.css" />
+    <link rel="stylesheet" href="/css/gallery.css" />
     <script>
       function deleteFile(publicId) {
         if (!confirm("Are you sure you want to delete this file?")) return;
@@ -38,7 +63,7 @@
   </head>
   <body>
     <h1>
-      <a href="/" style="color: white; text-decoration: none">TempStorage</a>
+      <a href="/" style="color: white; text-decoration: none">ImgBin</a>
     </h1>
     <div class="table-container">
       <table>
@@ -87,6 +112,6 @@
         </tbody>
       </table>
     </div>
-    <footer>© 2025 Heikal Syah Shiddiq. All rights reserved.</footer>
+    <footer>© 2025 ImgBin. All rights reserved.</footer>
   </body>
 </html>

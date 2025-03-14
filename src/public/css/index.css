@@ -54,11 +54,11 @@ h1 {
   background: #45a049;
 }
 
-.btn.files {
+.btn.gallery {
   background: #2196f3;
 }
 
-.btn.files:hover {
+.btn.gallery:hover {
   background: #1976d2;
 }
 

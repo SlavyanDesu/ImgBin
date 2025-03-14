@@ -1,94 +1,9 @@
 import express, { Request, Response } from "express";
-import multer, { FileFilterCallback } from "multer";
 import path from "path";
-import * as nsfwjs from "nsfwjs";
-import { createCanvas, loadImage } from "canvas";
-import cloudinary from "../config/cloudinary";
 import prisma from "../lib/prisma";
-import { UploadApiResponse } from "cloudinary";
+import { upload, uploadToCloudinary } from "../services/uploader";
 
 const router = express.Router();
-
-let nsfwModel: nsfwjs.NSFWJS | null = null;
-
-const loadModel = async () => {
-  nsfwModel = await nsfwjs.load("MobileNetV2");
-  console.log("[NSFWJS] NSFWJS model loaded!");
-};
-
-loadModel();
-
-const isNsfw = async (imageBuffer: Buffer) => {
-  if (!nsfwModel) throw new Error("NSFW model is not loaded");
-  const img = await loadImage(imageBuffer);
-
-  const canvas = createCanvas(img.width, img.height);
-  const ctx = canvas.getContext("2d");
-
-  ctx.drawImage(img, 0, 0, img.width, img.height);
-
-  const predictions = await nsfwModel.classify(
-    canvas as unknown as HTMLCanvasElement,
-  );
-
-  return predictions;
-};
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (
-    req: Request,
-    file: Express.Multer.File,
-    cb: FileFilterCallback,
-  ) => {
-    const filetypes = /jpeg|jpg|png/;
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase(),
-    );
-    const mimetype = filetypes.test(file.mimetype);
-    if (mimetype && extname) {
-      cb(null, true);
-    } else {
-      cb(new Error("[ERROR] Error: File type not allowed"));
-    }
-  },
-});
-
-const uploadToCloudinary = async (
-  fileBuffer: Buffer,
-  fileName: string,
-): Promise<{ url: string; publicId: string } | null> => {
-  const predictions = await isNsfw(fileBuffer);
-  const formattedPredictions = predictions
-    .map((p) => `${p.className}: ${(p.probability * 100).toFixed(2)}%`)
-    .join("\n");
-  console.log(`[NSFWJS] Predictions:\n${formattedPredictions}`);
-
-  const nsfwScore = predictions.find(
-    (p) => p.className === "Porn" || p.className === "Hentai",
-  );
-
-  if (nsfwScore && nsfwScore.probability > 0.5) {
-    console.warn("[NSFWJS] Upload blocked due to NSFW content");
-    return null;
-  }
-
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { resource_type: "auto", public_id: fileName },
-      (error: Error | undefined, result?: UploadApiResponse) => {
-        if (error || !result) {
-          console.error("[ERROR] Cloudinary Upload Error:", error);
-          reject(new Error("Upload failed"));
-        } else {
-          resolve({ url: result.secure_url, publicId: result.public_id });
-        }
-      },
-    );
-    uploadStream.end(fileBuffer);
-  });
-};
 
 router.get("/", (req: Request, res: Response) => {
   res.render("upload");
@@ -99,7 +14,12 @@ router.post(
   upload.single("file"),
   async (req: Request, res: Response): Promise<void> => {
     if (!req.file) {
-      res.status(400).json({ message: "No file uploaded" });
+      res.status(400).json({
+        success: false,
+        url: null,
+        publicId: null,
+        message: "No file uploaded",
+      });
       return;
     }
 
@@ -119,7 +39,12 @@ router.post(
       );
 
       if (!uploadResult) {
-        res.status(400).json({ message: "NSFW content detected!" });
+        res.status(400).json({
+          success: false,
+          url: null,
+          publicId: null,
+          message: "NSFW content detected!",
+        });
         return;
       }
 
@@ -136,10 +61,20 @@ router.post(
         },
       });
 
-      res.json({ url, publicId });
+      res.json({
+        success: true,
+        url: url,
+        publicId: publicId,
+        message: "File uploaded successfully",
+      });
     } catch (error: unknown) {
       console.error("[ERROR] Upload error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({
+        success: false,
+        url: null,
+        publicId: null,
+        message: "Internal server error",
+      });
     }
   },
 );

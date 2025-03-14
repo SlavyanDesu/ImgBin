@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { ResourceApiResponse, ResourceType } from "cloudinary";
-import cloudinary from "../config/cloudinary";
+import cloudinary from "../configs/cloudinary";
 
 const router = express.Router();
 
@@ -40,10 +40,10 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
     const files: FormattedFile[] = formatFiles(result.resources);
     console.log(`[DONE] Successfully retrieved ${files.length} files.`);
 
-    res.render("files", { files });
-  } catch (error: unknown) {
+    res.render("gallery", { files });
+  } catch (error) {
     console.error("[ERROR] Error fetching files:", error);
-    res.status(500).json({ message: "Failed to fetch files" });
+    res.status(500).json({ success: false, message: "Failed to fetch files" });
   }
 });
 
