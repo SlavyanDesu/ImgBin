@@ -52,6 +52,7 @@ PORT=3000
 DATABASE_URL="postgresql://your-neondb:url@ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech/dbname?sslmode=require"
 GOOGLE_APPLICATION_CREDENTIALS="./key/your-gcp-key.json"
 MODERATION="nsfwjs"
+CLEANUP_SECRET="your-cleanup-secret"
 ```
 
 - `MODERATION` can be either `nsfwjs` or `google-vision`.
