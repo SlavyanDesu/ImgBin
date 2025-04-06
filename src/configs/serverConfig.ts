@@ -1,10 +1,7 @@
-import path from "path";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application } from "express";
-import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
-
-dotenv.config();
+import path from "path";
 
 const MODERATION_METHOD = process.env.MODERATION;
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -49,4 +46,4 @@ const configureServer = (app: Application): void => {
   app.use(express.static(path.join(baseDir, "public")));
 };
 
-export { MODERATION_METHOD, PORT, getGCPCredentials, configureServer };
+export { configureServer, getGCPCredentials, MODERATION_METHOD, PORT };

@@ -19,6 +19,7 @@
     - [Upload Endpoint](#upload-endpoint)
     - [Delete Endpoint](#delete-endpoint)
     - [Files Endpoint](#files-endpoint)
+    - [Cleanup Endpoint](#cleanup-endpoint)
   - [License](#license)
 
 ## Installation
@@ -94,6 +95,7 @@ Visit http://localhost:3000 in your browser to access the app.
 - NeonDB
 - TypeScript
 - EJS
+- GitHub Action
 
 ## API Documentation
 
@@ -129,6 +131,39 @@ Visit http://localhost:3000 in your browser to access the app.
 
 - GET `/files`
 - Response: Renders a page displaying uploaded images.
+
+### Cleanup Endpoint
+
+- GET `/api/cleanup?token=YOUR_SECRET_TOKEN`
+- Description: Deletes files older than 3 days from both Cloudinary and the database.
+- Authorization: Requires a valid token via query parameter `token`.
+- Response example (success):
+
+```json
+{
+  "success": true,
+  "message": "Deleted 3 files"
+}
+```
+
+- Response example (unauthorized):
+
+```json
+{
+  "message": "Forbidden"
+}
+```
+
+- Response example (error):
+
+```json
+{
+  "success": false,
+  "message": "An error occurred during cleanup."
+}
+```
+
+> Note: This endpoint is intended to be triggered programmatically (e.g., via a cron job or GitHub Action). Do not expose your secret token publicly.
 
 ## License
 

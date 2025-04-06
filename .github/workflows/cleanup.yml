@@ -1,0 +1,13 @@
+name: Cleanup Image Files
+
+on:
+  schedule:
+    - cron: "0 20 * * *"
+
+jobs:
+  ping-vercel-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Vercel Cleanup Endpoint
+        run: curl "https://imgbin.vercel.app/api/cleanup?token=${{ secrets.CLEANUP_SECRET }}"
+        shell: bash
