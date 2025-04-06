@@ -1,8 +1,10 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
+import { configureServer, PORT } from "./configs/serverConfig";
 import { applyMiddlewares } from "./middlewares";
 import { routes } from "./routes";
-import { PORT } from "./configs/serverConfig";
-import { configureServer } from "./configs/serverConfig";
 
 const app = express();
 
