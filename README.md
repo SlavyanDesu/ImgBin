@@ -20,6 +20,7 @@
     - [Delete Endpoint](#delete-endpoint)
     - [Files Endpoint](#files-endpoint)
     - [Cleanup Endpoint](#cleanup-endpoint)
+    - [Force Cleanup Endpoint](#force-cleanup-endpoint)
   - [License](#license)
 
 ## Installation
@@ -111,7 +112,7 @@ Visit http://localhost:3000 in your browser to access the app.
   "success": true,
   "url": "https://res.cloudinary.com/abcd/image/upload/v1741948827/1741948783559-picture.png",
   "publicId": "1741948783559-picture",
-  "message": "File deleted successfully"
+  "message": "File uploaded successfully"
 }
 ```
 
@@ -165,6 +166,37 @@ Visit http://localhost:3000 in your browser to access the app.
 ```
 
 > Note: This endpoint is intended to be triggered programmatically (e.g., via a cron job or GitHub Action). Do not expose your secret token publicly.
+
+### Force Cleanup Endpoint
+
+- GET `/api/force-cleanup?token=YOUR_SECRET_TOKEN`
+- Description: Deletes **ALL** files from both Cloudinary and the database.
+- Authorization: Requires a valid token via query parameter `token`.
+- Response example (success):
+
+```json
+{
+  "success": true,
+  "message": "Deleted 3 files"
+}
+```
+
+- Response example (unauthorized):
+
+```json
+{
+  "message": "Forbidden"
+}
+```
+
+- Response example (error):
+
+```json
+{
+  "success": false,
+  "message": "An error occurred during force cleanup."
+}
+```
 
 ## License
 
