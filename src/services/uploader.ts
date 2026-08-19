@@ -7,7 +7,10 @@ import { MODERATION_METHOD } from "../configs/serverConfig";
 import { isNsfw } from "./moderation";
 
 const fileTypes = /jpeg|jpg|png/;
-const fileSize = 10 * 1024 * 1024; // 10 MB
+
+// Cloudinary free plan has a limit of 10 MB, you can adjust this limit based on your Cloudinary plan
+const fileSize = 10 * 1024 * 1024;
+
 const nsfwThreshold = 0.5;
 
 interface UploadResult {

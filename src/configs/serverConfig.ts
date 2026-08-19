@@ -5,6 +5,7 @@ import path from "path";
 
 const MODERATION_METHOD = process.env.MODERATION;
 const PORT = parseInt(process.env.PORT || "3000", 10);
+const ORIGIN = process.env.ORIGIN || "https://imgbin.vercel.app";
 
 const isProd = process.env.NODE_ENV === "production";
 const baseDir = isProd
@@ -35,7 +36,7 @@ const configureServer = (app: Application): void => {
 
   app.use(
     cors({
-      origin: "https://tempstorage.vercel.app",
+      origin: ORIGIN,
       credentials: true,
     }),
   );

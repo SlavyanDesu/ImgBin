@@ -3,11 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <meta property="og:title" content="ImgBin" />
-    <meta
-      property="description"
-      content="Quick and temporary image hosting."
-    />
+    <meta property="description" content="Quick and temporary image hosting." />
     <meta
       property="og:description"
       content="Quick and temporary image hosting."
@@ -18,6 +16,7 @@
       content="https://imgbin.vercel.app/assets/aaa.jpg"
     />
     <meta property="og:url" content="https://imgbin.vercel.app" />
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ImgBin" />
     <meta
@@ -27,20 +26,35 @@
     <meta
       name="twitter:image"
       content="https://imgbin.vercel.app/assets/aaa.jpg"
-    />  
+    />
+
     <title>ImgBin</title>
+
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     />
+
     <link rel="stylesheet" href="/css/index.css" />
   </head>
+
   <body>
-    <h1>ImgBin</h1>
-    <p class="subheader">
-      Quick and temporary image hosting.
-    </p>
-    <a href="/upload" class="btn upload">Upload</a>
-    <a href="/gallery" class="btn gallery">Gallery</a>
+    <header id="header">
+      <a href="/" id="logo">ImgBin</a>
+    </header>
+
+    <main class="home">
+      <h1>ImgBin</h1>
+
+      <p class="subheader">Quick & temporary image hosting.</p>
+
+      <div class="actions">
+        <a href="/upload" class="btn upload"> Upload Images </a>
+
+        <a href="/gallery" class="btn gallery"> View Gallery </a>
+      </div>
+
+      <p class="notice">Do not upload sensitive images or personal data.</p>
+    </main>
   </body>
 </html>

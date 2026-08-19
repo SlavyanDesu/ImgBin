@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import prisma from "../lib/prisma";
+import { randomUUID } from "crypto";
 import { upload, uploadToCloudinary } from "../services/uploader";
 
 const router = express.Router();
@@ -11,68 +12,84 @@ router.get("/", (req: Request, res: Response) => {
 
 router.post(
   "/",
-  upload.single("file"),
+  upload.array("file", 10),
   async (req: Request, res: Response): Promise<void> => {
-    if (!req.file) {
+    const files = req.files as Express.Multer.File[];
+
+    if (!files || files.length === 0) {
       res.status(400).json({
         success: false,
-        url: null,
-        publicId: null,
-        message: "No file uploaded",
+        results: [],
+        message: "No files uploaded",
       });
       return;
     }
 
     try {
-      console.log(`[PROCESS] Uploading: ${req.file.originalname}`);
-
-      const fileExt: string = path.extname(req.file.originalname);
-      const fileNameWithoutExt: string = req.file.originalname.replace(
-        fileExt,
-        "",
-      );
-      const uniqueFilename: string = `${Date.now()}-${encodeURIComponent(fileNameWithoutExt)}`;
-
-      const uploadResult = await uploadToCloudinary(
-        req.file.buffer,
-        uniqueFilename,
-      );
-
-      if (!uploadResult) {
-        res.status(400).json({
-          success: false,
-          url: null,
-          publicId: null,
-          message: "NSFW content detected!",
-        });
-        return;
-      }
-
-      const { url, publicId } = uploadResult;
-
-      console.log(`[DONE] Successfully uploaded! URL: ${url}`);
-
       const userId: string = req.cookies.userId;
+      const results = [];
 
-      await prisma.fileMetadata.create({
-        data: {
+      for (const file of files) {
+        console.log(`[PROCESS] Uploading: ${file.originalname}`);
+
+        const fileExt: string = path.extname(file.originalname);
+        const fileNameWithoutExt: string = file.originalname.replace(
+          fileExt,
+          "",
+        );
+
+        const uniqueFilename = `${randomUUID()}-${encodeURIComponent(
+          fileNameWithoutExt,
+        )}`;
+
+        const uploadResult = await uploadToCloudinary(
+          file.buffer,
+          uniqueFilename,
+        );
+
+        if (!uploadResult) {
+          console.warn(`[BLOCKED] NSFW content detected: ${file.originalname}`);
+
+          results.push({
+            filename: file.originalname,
+            success: false,
+            message: "NSFW content detected!",
+          });
+
+          continue;
+        }
+
+        const { url, publicId } = uploadResult;
+
+        console.log(`[DONE] Successfully uploaded! URL: ${url}`);
+
+        await prisma.fileMetadata.create({
+          data: {
+            publicId,
+            userId,
+          },
+        });
+
+        results.push({
+          filename: file.originalname,
+          success: true,
+          url,
           publicId,
-          userId: userId,
-        },
-      });
+          message: "File uploaded successfully",
+        });
+      }
 
       res.json({
         success: true,
-        url: url,
-        publicId: publicId,
-        message: "File uploaded successfully",
+        results,
+        message: `${results.filter((result) => result.success).length} file(s) uploaded successfully`,
       });
     } catch (error: unknown) {
       console.error("[ERROR] Upload error:", error);
+
       res.status(500).json({
         success: false,
-        url: null,
-        publicId: null,
+        results: [],
         message: "Internal server error",
       });
     }
