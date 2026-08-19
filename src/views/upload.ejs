@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <meta property="og:title" content="ImgBin | Upload" />
     <meta
       property="description"
@@ -18,6 +19,7 @@
       content="https://imgbin.vercel.app/assets/aaa.jpg"
     />
     <meta property="og:url" content="https://imgbin.vercel.app/upload" />
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ImgBin | Upload" />
     <meta
@@ -28,99 +30,372 @@
       name="twitter:image"
       content="https://imgbin.vercel.app/assets/aaa.jpg"
     />
+
     <title>ImgBin | Upload</title>
+
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     />
+
     <link rel="stylesheet" href="/css/upload.css" />
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        let selectedFile = null;
+        let selectedFiles = [];
 
-        document
-          .getElementById("fileInput")
-          .addEventListener("change", function () {
-            if (this.files.length > 0) {
-              selectedFile = this.files[0];
-              document.getElementById("fileName").textContent =
-                selectedFile.name;
-            } else {
-              selectedFile = null;
-              document.getElementById("fileName").textContent =
-                "No file chosen";
+        const fileInput = document.getElementById("fileInput");
+        const dropZone = document.getElementById("dropZone");
+        const fileName = document.getElementById("fileName");
+        const previewContainer = document.getElementById("previewContainer");
+
+        const uploadForm = document.getElementById("uploadForm");
+        const uploadButton = document.getElementById("uploadButton");
+
+        const statusMessage = document.getElementById("statusMessage");
+
+        const goToGallery = document.getElementById("goToGallery");
+
+        const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+        const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
+        // =========================
+        // FILE SELECTION
+        // =========================
+
+        function addFiles(files) {
+          const newFiles = Array.from(files);
+
+          let rejectedFiles = [];
+
+          for (const file of newFiles) {
+            if (!ALLOWED_TYPES.includes(file.type)) {
+              rejectedFiles.push(`${file.name}: unsupported file type`);
+              continue;
             }
+
+            if (file.size > MAX_FILE_SIZE) {
+              rejectedFiles.push(`${file.name}: exceeds 10 MB`);
+              continue;
+            }
+
+            const duplicate = selectedFiles.some(
+              (existingFile) =>
+                existingFile.name === file.name &&
+                existingFile.size === file.size &&
+                existingFile.lastModified === file.lastModified,
+            );
+
+            if (!duplicate) {
+              selectedFiles.push(file);
+            }
+          }
+
+          updateUI();
+
+          if (rejectedFiles.length > 0) {
+            showError(rejectedFiles.join(" • "));
+          }
+        }
+
+        document.addEventListener("paste", function (event) {
+          const items = event.clipboardData?.items;
+
+          if (!items) return;
+
+          const imageFiles = [];
+
+          for (const item of items) {
+            if (!item.type.startsWith("image/")) {
+              continue;
+            }
+
+            const file = item.getAsFile();
+
+            if (!file) continue;
+
+            const extension =
+              item.type === "image/png"
+                ? "png"
+                : item.type === "image/jpeg"
+                  ? "jpg"
+                  : "png";
+
+            const renamedFile = new File(
+              [file],
+              `pasted-image-${Date.now()}.${extension}`,
+              {
+                type: item.type,
+              },
+            );
+
+            imageFiles.push(renamedFile);
+          }
+
+          if (imageFiles.length > 0) {
+            addFiles(imageFiles);
+          }
+        });
+
+        // =========================
+        // REMOVE FILE
+        // =========================
+
+        function removeFile(index) {
+          selectedFiles.splice(index, 1);
+
+          updateUI();
+
+          if (selectedFiles.length === 0) {
+            fileInput.value = "";
+          }
+        }
+
+        // =========================
+        // UPDATE UI
+        // =========================
+
+        function updateUI() {
+          previewContainer.innerHTML = "";
+
+          if (selectedFiles.length === 0) {
+            fileName.textContent = "No file chosen";
+            uploadButton.disabled = true;
+            return;
+          }
+
+          fileName.textContent = `${selectedFiles.length} file(s) selected`;
+
+          uploadButton.disabled = false;
+
+          selectedFiles.forEach((file, index) => {
+            const previewItem = document.createElement("div");
+
+            previewItem.className = "previewItem";
+
+            const image = document.createElement("img");
+
+            image.className = "previewImage";
+
+            const info = document.createElement("div");
+
+            info.className = "previewInfo";
+
+            const name = document.createElement("span");
+
+            name.className = "previewName";
+            name.textContent = file.name;
+
+            const size = document.createElement("span");
+
+            size.className = "previewSize";
+            size.textContent = formatFileSize(file.size);
+
+            const removeButton = document.createElement("button");
+
+            removeButton.type = "button";
+            removeButton.className = "removeFile";
+            removeButton.textContent = "×";
+            removeButton.title = "Remove file";
+
+            removeButton.addEventListener("click", function () {
+              removeFile(index);
+            });
+
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+              image.src = event.target.result;
+            };
+
+            reader.readAsDataURL(file);
+
+            info.appendChild(name);
+            info.appendChild(size);
+
+            previewItem.appendChild(image);
+            previewItem.appendChild(info);
+            previewItem.appendChild(removeButton);
+
+            previewContainer.appendChild(previewItem);
+          });
+        }
+
+        // =========================
+        // FILE SIZE
+        // =========================
+
+        function formatFileSize(bytes) {
+          if (bytes < 1024 * 1024) {
+            return `${(bytes / 1024).toFixed(1)} KB`;
+          }
+
+          return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        // =========================
+        // ERROR
+        // =========================
+
+        function showError(message) {
+          statusMessage.textContent = message;
+          statusMessage.style.color = "rgb(209, 35, 35)";
+          statusMessage.style.display = "block";
+        }
+
+        // =========================
+        // FILE INPUT
+        // =========================
+
+        fileInput.addEventListener("change", function () {
+          addFiles(this.files);
+
+          // Allows selecting the same file again
+          this.value = "";
+        });
+
+        // =========================
+        // DROP ZONE CLICK
+        // =========================
+
+        dropZone.addEventListener("click", function () {
+          fileInput.click();
+        });
+
+        // =========================
+        // DRAG & DROP
+        // =========================
+
+        dropZone.addEventListener("dragover", function (e) {
+          e.preventDefault();
+
+          dropZone.classList.add("dragover");
+        });
+
+        dropZone.addEventListener("dragleave", function () {
+          dropZone.classList.remove("dragover");
+        });
+
+        dropZone.addEventListener("drop", function (e) {
+          e.preventDefault();
+
+          dropZone.classList.remove("dragover");
+
+          addFiles(e.dataTransfer.files);
+        });
+
+        // =========================
+        // UPLOAD
+        // =========================
+
+        uploadForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          if (selectedFiles.length === 0) {
+            showError("Please select at least one file.");
+            return;
+          }
+
+          uploadButton.disabled = true;
+
+          statusMessage.textContent = "Uploading...";
+          statusMessage.style.color = "yellow";
+          statusMessage.style.display = "block";
+
+          goToGallery.style.display = "none";
+
+          const formData = new FormData();
+
+          selectedFiles.forEach((file) => {
+            formData.append("file", file);
           });
 
-        document
-          .getElementById("uploadForm")
-          .addEventListener("submit", async function (e) {
-            e.preventDefault();
-            const statusMessage = document.getElementById("statusMessage");
-            const goToGallery = document.getElementById("goToGallery");
+          try {
+            const response = await fetch("/upload", {
+              method: "POST",
+              body: formData,
+            });
 
-            if (!selectedFile) {
-              alert("Please select a file!");
-              return;
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.message || "Upload failed");
             }
 
-            statusMessage.textContent = "Uploading...";
-            statusMessage.style.color = "yellow";
-            statusMessage.style.display = "block";
+            statusMessage.textContent = result.message || "Upload Successful!";
 
-            const formData = new FormData();
-            formData.append("file", selectedFile);
+            statusMessage.style.color = "limegreen";
 
-            try {
-              const response = await fetch("/upload", {
-                method: "POST",
-                body: formData,
-              });
+            goToGallery.style.display = "block";
 
-              const result = await response.json();
-              if (!response.ok)
-                throw new Error(result.message || "Upload failed");
+            selectedFiles = [];
 
-              statusMessage.textContent = "Upload Successful!";
-              statusMessage.style.color = "limegreen";
-              goToGallery.style.display = "block";
-              document.getElementById("fileInput").value = "";
-              document.getElementById("fileName").textContent =
-                "No file chosen";
-            } catch (error) {
-              statusMessage.textContent = `Upload Failed: ${error.message}`;
-              statusMessage.style.color = "rgb(209, 35, 35)";
-              selectedFile = null;
-              document.getElementById("fileInput").value = "";
-              document.getElementById("fileName").textContent =
-                "No file chosen";
-            }
-          });
+            fileInput.value = "";
+
+            updateUI();
+          } catch (error) {
+            console.error(error);
+
+            statusMessage.textContent = `Upload Failed: ${error.message}`;
+
+            statusMessage.style.color = "rgb(209, 35, 35)";
+          } finally {
+            uploadButton.disabled = selectedFiles.length === 0;
+
+            uploadButton.textContent = "Upload";
+          }
+        });
+
+        // Initial state
+        updateUI();
       });
     </script>
   </head>
+
   <body>
-    <h1>Upload File</h1>
-    <div
-      id="warningMessage"
-      style="
-        color: rgb(209, 35, 35);
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-weight: bold;
-        font-size: 12px;
-      "
-    >
-      Please do not upload sensitive images or personal data.<br />
+    <header id="header">
+      <a href="/" id="logo">ImgBin</a>
+    </header>
+
+    <h1>Upload Images</h1>
+
+    <div id="warningMessage">
+      <strong>⚠ Privacy Notice</strong>
+      <span> Please do not upload sensitive images or personal data. </span>
     </div>
+
     <form id="uploadForm" enctype="multipart/form-data">
-      <label for="fileInput">Choose File</label>
-      <input type="file" name="file" id="fileInput" />
-      <span id="fileName">No file chosen</span>
-      <button type="submit">Upload</button>
+      <div id="dropZone">
+        <div class="dropIcon">📁</div>
+
+        <strong>Drop images here</strong>
+
+        <span>or click to browse</span>
+
+        <small> You can also paste an image with Ctrl+V </small>
+
+        <small> JPG, JPEG, PNG • Max 10 MB per file </small>
+
+        <input
+          type="file"
+          name="file"
+          id="fileInput"
+          accept="image/jpeg,image/png"
+          multiple
+          hidden
+        />
+      </div>
+
+      <span id="fileName"> No file chosen </span>
+
+      <div id="previewContainer"></div>
+
+      <button type="submit" id="uploadButton" disabled>Upload</button>
     </form>
+
     <p id="statusMessage" style="display: none">Uploading...</p>
+
     <button id="goToGallery" onclick="window.location.href='/gallery'">
       Go to Gallery
     </button>

@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <meta property="og:title" content="ImgBin | Gallery" />
     <meta
       property="description"
@@ -18,6 +19,7 @@
       content="https://imgbin.vercel.app/assets/aaa.jpg"
     />
     <meta property="og:url" content="https://imgbin.vercel.app/gallery" />
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ImgBin | Gallery" />
     <meta
@@ -28,29 +30,34 @@
       name="twitter:image"
       content="https://imgbin.vercel.app/assets/aaa.jpg"
     />
+
     <title>ImgBin | Gallery</title>
+
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     />
+
     <link rel="stylesheet" href="/css/gallery.css" />
+
     <script>
       function deleteFile(publicId) {
         if (!confirm("Are you sure you want to delete this file?")) return;
 
-        fetch(`/delete/${encodeURIComponent(publicId)}`, { method: "DELETE" })
+        fetch(`/delete/${encodeURIComponent(publicId)}`, {
+          method: "DELETE",
+        })
           .then((response) => {
             if (response.ok) {
               return response.json();
-            } else {
-              return response.json().then((data) => {
-                throw new Error(data.message || "Failed to delete file");
-              });
             }
+
+            return response.json().then((data) => {
+              throw new Error(data.message || "Failed to delete file");
+            });
           })
           .then((data) => {
             if (data.success) {
-              alert("File deleted successfully!");
               location.reload();
             }
           })
@@ -59,59 +66,267 @@
             console.error("[ERROR] Error:", error);
           });
       }
+
+      function openImage(url, filename) {
+        const dialog = document.getElementById("imageDialog");
+        const image = document.getElementById("dialogImage");
+        const filenameElement = document.getElementById("dialogFilename");
+        const downloadButton = document.getElementById("dialogDownload");
+        const deleteButton = document.getElementById("dialogDelete");
+
+        image.src = url;
+        image.alt = filename;
+
+        filenameElement.textContent = filename;
+
+        downloadButton.href = url;
+
+        deleteButton.onclick = function () {
+          closeImage();
+          deleteFile(filename);
+        };
+
+        dialog.showModal();
+      }
+
+      function closeImage() {
+        const dialog = document.getElementById("imageDialog");
+
+        dialog.close();
+
+        document.getElementById("dialogImage").src = "";
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const dialog = document.getElementById("imageDialog");
+
+        dialog.addEventListener("click", function (event) {
+          if (event.target === dialog) {
+            closeImage();
+          }
+        });
+      });
     </script>
   </head>
+
   <body>
-    <h1>
-      <a href="/" style="color: white; text-decoration: none">ImgBin</a>
-    </h1>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Thumbnail</th>
-            <th>Filename</th>
-            <th>Date Uploaded</th>
-            <th>Size</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% files.forEach(file => { %>
-          <tr>
-            <td>
-              <img
-                src="<%= file.thumbnailUrl %>"
-                alt="Thumbnail"
-                class="thumbnail"
-              />
-            </td>
-            <td class="filename"><%= file.filename %></td>
-            <td><%= new Date(file.dateUploaded).toLocaleDateString() %></td>
-            <td>
-              <%= file.size >= 1000 * 1024 ? (file.size / (1024 *
-              1024)).toFixed(2) + ' MB' : (file.size / 1024).toFixed(2) + ' KB'
-              %>
-            </td>
-            <td class="action-buttons">
+    <header id="header">
+      <a href="/" id="logo">ImgBin</a>
+    </header>
+
+    <main class="gallery-page">
+      <div class="gallery-header">
+        <div>
+          <h1>Gallery</h1>
+          <p>Browse and manage your uploaded images.</p>
+        </div>
+
+        <a href="/upload" class="upload-button"> Upload Images </a>
+      </div>
+
+      <% if (files.length === 0) { %>
+
+      <div class="empty-gallery">
+        <div class="empty-icon">🖼️</div>
+
+        <h2>No images yet</h2>
+
+        <p>Upload some images and they'll appear here.</p>
+
+        <a href="/upload" class="upload-button"> Upload Images </a>
+      </div>
+
+      <% } else { %>
+
+      <div class="image-grid">
+        <% files.forEach(file => { %>
+
+        <article
+          class="image-card"
+          onclick="openImage(
+                '<%= file.downloadUrl %>',
+                '<%= file.filename %>'
+              )"
+        >
+          <div class="thumbnail-container">
+            <img
+              src="<%= file.thumbnailUrl %>"
+              alt="<%= file.filename %>"
+              class="thumbnail"
+              loading="lazy"
+            />
+          </div>
+
+          <div class="image-info">
+            <div class="filename" title="<%= file.filename %>">
+              <%= file.filename %>
+            </div>
+
+            <div class="metadata">
+              <span>
+                <%= file.size >= 1000 * 1024 ? `${(file.size / (1024 *
+                1024)).toFixed(2)} MB` : `${(file.size / 1024).toFixed(2)} KB`
+                %>
+              </span>
+
+              <span>•</span>
+
+              <span>
+                <%= new Date(
+                      file.dateUploaded
+                    ).toLocaleDateString() %>
+              </span>
+            </div>
+
+            <div class="action-buttons">
               <button
-                onclick="location.href='<%= file.downloadUrl %>'"
+                onclick="event.stopPropagation(); location.href='<%= file.downloadUrl %>'"
                 class="action-button download-btn"
               >
                 Download
               </button>
+
               <button
-                onclick="deleteFile('<%= file.filename %>')"
+                onclick="event.stopPropagation(); deleteFile('<%= file.filename %>')"
                 class="action-button delete-btn"
               >
                 Delete
               </button>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
+            </div>
+          </div>
+        </article>
+
+        <% }) %>
+      </div>
+
+      <% if (totalPages > 1) { %>
+
+      <nav class="pagination" aria-label="Gallery pagination">
+        <% if (currentPage > 1) { %>
+
+        <a
+          href="/gallery?page=<%= currentPage - 1 %>"
+          class="page-button arrow"
+          aria-label="Previous page"
+        >
+          ←
+        </a>
+
+        <% } %>
+
+        <% if (totalPages <= 7) { %>
+
+        <% for (
+                let page = 1;
+                page <= totalPages;
+                page++
+              ) { %>
+
+        <a
+          href="/gallery?page=<%= page %>"
+          class="page-button <%= page === currentPage ? 'active' : '' %>"
+        >
+          <%= page %>
+        </a>
+
+        <% } %>
+
+        <% } else { %>
+
+        <a
+          href="/gallery?page=1"
+          class="page-button <%= currentPage === 1 ? 'active' : '' %>"
+        >
+          1
+        </a>
+
+        <% if (currentPage > 4) { %>
+
+        <span class="pagination-dots">...</span>
+
+        <% } %>
+
+        <% let startPage = Math.max( 2, currentPage - 1 ); let endPage =
+        Math.min( totalPages - 1, currentPage + 1 ); if (currentPage <= 3) {
+        startPage = 2; endPage = 4; } if (currentPage >= totalPages - 2) {
+        startPage = totalPages - 3; endPage = totalPages - 1; } %>
+
+        <% for (
+                let page = startPage;
+                page <= endPage;
+                page++
+              ) { %>
+
+        <a
+          href="/gallery?page=<%= page %>"
+          class="page-button <%= page === currentPage ? 'active' : '' %>"
+        >
+          <%= page %>
+        </a>
+
+        <% } %>
+
+        <% if (currentPage < totalPages - 3) { %>
+
+        <span class="pagination-dots">...</span>
+
+        <% } %>
+
+        <a
+          href="/gallery?page=<%= totalPages %>"
+          class="page-button <%= currentPage === totalPages ? 'active' : '' %>"
+        >
+          <%= totalPages %>
+        </a>
+
+        <% } %>
+
+        <% if (currentPage < totalPages) { %>
+
+        <a
+          href="/gallery?page=<%= currentPage + 1 %>"
+          class="page-button arrow"
+          aria-label="Next page"
+        >
+          →
+        </a>
+
+        <% } %>
+      </nav>
+
+      <p class="page-info">Page <%= currentPage %> of <%= totalPages %></p>
+
+      <% } %>
+
+      <% } %>
+    </main>
+
+    <!-- IMAGE PREVIEW DIALOG -->
+
+    <dialog id="imageDialog">
+      <div class="image-dialog-content">
+        <button class="dialog-close" onclick="closeImage()" aria-label="Close">
+          ×
+        </button>
+
+        <img id="dialogImage" src="" alt="" />
+
+        <div class="dialog-info">
+          <p id="dialogFilename"></p>
+
+          <div class="dialog-actions">
+            <a id="dialogDownload" href="" class="dialog-button download-btn">
+              Download
+            </a>
+
+            <button id="dialogDelete" class="dialog-button delete-btn">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
     <footer>© 2025 ImgBin. All rights reserved.</footer>
   </body>
 </html>
